@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>AI Text Analyzer</h1>
+        <p class="subtitle">Multi-Model Sentiment & Spam Detection</p>
+        
+        <div class="input-section">
+            <textarea id="textInput" placeholder="Enter text to analyze..."></textarea>
+            <button id="analyzeBtn">Analyze Text</button>
+        </div>
+
+        <div id="loading" class="hidden">Analyzing...</div>
+
+        <div id="resultSection" class="result-section hidden">
+            <h2>Analysis Results</h2>
+            <div class="result-grid">
+                <div class="result-card">
+                    <span class="label">Sentiment</span>
+                    <span id="sentimentResult" class="value"></span>
+                </div>
+                <div class="result-card">
+                    <span class="label">Spam Status</span>
+                    <span id="spamResult" class="value"></span>
+                </div>
+            </div>
+            <div class="result-card keywords-card">
+                <span class="label">Keywords</span>
+                <div id="keywordsResult" class="keywords-list"></div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

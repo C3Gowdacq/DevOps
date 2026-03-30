@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv
+venv/
+ENV/
+
+# Models
+# We keep models in this project as per requirements, but usually they are ignored.
+# Since the user specifically asked for models to be included in Step 5 (Dockerize),
+# we will NOT ignore the .pkl files in the models directory for now.
+
+# OS
+.DS_Store
+Thumbs.db
