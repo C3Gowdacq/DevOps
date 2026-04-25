@@ -4,3 +4,4 @@ scikit-learn
 pydantic
 aiofiles
 numpy
+pandas
