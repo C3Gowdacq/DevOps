@@ -47,4 +47,4 @@ jobs:
       with:
         context: .
         push: true
-        tags: c3gowda/ai-text-analyzer:latest
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/ai-text-analyzer:latest
