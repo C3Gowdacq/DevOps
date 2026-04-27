@@ -5,13 +5,7 @@ import pickle
 import os
 import re
 
-app = FastAPI(title="Multi-Model AI Text Analyzer API")
-
-# Version tracker to ensure we are running the latest code
-SYSTEM_VERSION = "2.0.0-Hybrid"
-
-# Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+from contextlib import asynccontextmanager
 
 # Path to models
 MODEL_DIR = "models"
@@ -21,9 +15,11 @@ SPAM_MODEL_PATH = os.path.join(MODEL_DIR, "spam_model.pkl")
 SPAM_VECT_PATH = os.path.join(MODEL_DIR, "spam_vectorizer.pkl")
 
 models = {}
+SYSTEM_VERSION = "2.1.0-SlangFixed"
 
-@app.on_event("startup")
-def load_models():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Load models on startup
     try:
         with open(SPAM_MODEL_PATH, "rb") as f:
             models["spam_model"] = pickle.load(f)
@@ -35,7 +31,15 @@ def load_models():
             models["sentiment_vect"] = pickle.load(f)
         print(f"--- System Version {SYSTEM_VERSION} Loaded ---")
     except Exception as e:
-        print(f"Error loading models: {e}")
+        print(f"CRITICAL ERROR: Failed to load models: {e}")
+        print("Suggestion: Ensure you are running with the correct virtual environment (venv).")
+    
+    yield
+    # Clean up on shutdown
+    models.clear()
+
+app = FastAPI(title="Multi-Model AI Text Analyzer API", lifespan=lifespan)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 class TextRequest(BaseModel):
     text: str
@@ -49,7 +53,7 @@ class AnalysisResult(BaseModel):
 def extract_keywords(text: str):
     return list(set(re.findall(r'\b\w{4,}\b', text.lower())))
 
-POSITIVE_SLANG_PATTERNS = ["killed the", "killing the", "nailed it", "sick", "insane", "crushed it", "savage", "killed it"]
+POSITIVE_SLANG_PATTERNS = ["nailed it", "sick", "insane", "crushed it", "savage", "killed it", "killed the performance", "killing the game"]
 
 @app.get("/")
 async def read_index():
@@ -61,6 +65,10 @@ async def analyze_text(request: TextRequest):
     text = request.text.lower().strip()
     if not text:
         raise HTTPException(status_code=400, detail="Text cannot be empty")
+
+    # 0. Check if models are loaded
+    if not models:
+        raise HTTPException(status_code=503, detail="Models not loaded. Check server logs.")
 
     # 1. ML Prediction
     sent_X = models["sentiment_vect"].transform([text])

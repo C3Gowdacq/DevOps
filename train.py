@@ -47,10 +47,17 @@ def generate_enhanced_dataset():
 
     # 4. LITERAL NEGATIVES with 'killed/broke' (500)
     # This teaches context: if you see 'error' or 'bug' near 'killed', it is Negative.
-    for _ in range(500):
+    for _ in range(300):
         problem = random.choice(["error", "bug", "glitch", "crash", "delay", "failure"])
         target = random.choice(["app", "system", "logic", "deployment", "experience"])
         sen = f"the {problem} {random.choice(['killed', 'broke', 'ruined'])} the {target} {random.randint(100, 999)}"
+        sentiment_data.append((sen, "negative"))
+
+    # 5. LITERAL VIOLENCE/HARM (500) - The "Anti-Slang" fix
+    # This ensures "killed someone" is negative even if "killed the performance" is positive.
+    violence_targets = ["someone", "a person", "him", "her", "them", "the bird", "the dog", "anybody"]
+    for _ in range(500):
+        sen = f"{random.choice(['i', 'he', 'they'])} {random.choice(['killed', 'harmed', 'attacked'])} {random.choice(violence_targets)} {random.randint(100, 999)}"
         sentiment_data.append((sen, "negative"))
 
     # Save to CSV
@@ -91,7 +98,7 @@ if __name__ == "__main__":
     with open("models/sentiment_model.pkl", "rb") as f: m = pickle.load(f)
     with open("models/sentiment_vectorizer.pkl", "rb") as f: v = pickle.load(f)
     
-    tests = ["you killed the performance", "the error killed the app"]
+    tests = ["you killed the performance", "the error killed the app", "i killed someone"]
     for t in tests:
-        p = m.predict(v.transform([t]))[0]
+        p = m.predict(v.transform([t.lower()]))[0]
         print(f"Check: '{t}' -> {p}")
